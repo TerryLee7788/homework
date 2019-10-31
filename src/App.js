@@ -3,7 +3,7 @@ import Dcard from './libs/Dcard';
 import Service from './libs/Service';
 
 import SearchInput from './components/SearchInput';
-import GithubRepoList from './components/GithubRepoList';
+import GithubRepo from './components/GithubRepo';
 
 import './normalize.css';
 
@@ -137,19 +137,21 @@ class App extends Component {
                     {
                         this.state.repos.length
                             ? (
-                                <section
-                                    className={styles.repoSearchResult}
-                                >
+                                <section>
                                     <h1>Repository Lists:</h1>
                                     <ul>
                                         {
                                             this.state.repos.map((item, idx) => (
-                                                <GithubRepoList
+                                                <li
+                                                    className={styles.list}
                                                     key={`${item.id}${idx}`}
-                                                    url={item.html_url}
-                                                    repoName={item.full_name}
-                                                    owner={item.owner.login}
-                                                />
+                                                >
+                                                    <GithubRepo
+                                                        url={item.html_url}
+                                                        repoName={item.full_name}
+                                                        owner={item.owner.login}
+                                                    />
+                                                </li>
                                             ))
                                         }
                                     </ul>

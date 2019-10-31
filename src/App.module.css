@@ -43,4 +43,6 @@
     justify-content: center;
 }
 
-.repoSearchResult {}
+.list {
+    padding: 8px;
+}
