@@ -1,0 +1,46 @@
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+.App {
+  text-align: center;
+}
+
+.appMain {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: 16px;
+    position: relative;
+    padding-top: 30px;
+}
+
+.appHeader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #006AA6;
+    padding: 20px;
+}
+
+.title {
+    font-size: 2em;
+    margin-bottom: 24px;
+}
+
+.mainFocus {
+    color: #000;
+    width: 600px;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.repoSearchResult {}

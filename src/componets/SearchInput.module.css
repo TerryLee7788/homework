@@ -1,0 +1,14 @@
+.inputContiner {
+    border: 1px solid #dfe1e5;
+    border-radius: 24px;
+    width: 100%;
+    display: flex;
+}
+
+.input {
+    padding: 8px 16px;
+    border-radius: 30px;
+    background: none;
+    border: none;
+    flex: 1;
+}

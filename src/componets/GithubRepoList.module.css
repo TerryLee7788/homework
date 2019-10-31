@@ -1,0 +1,20 @@
+.list {
+    padding: 8px;
+}
+
+.link {
+    color: #70b3fb;
+    text-decoration: none;
+}
+
+.starContainer {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    color: #000;
+    margin-right: 4px;
+    padding: 0 4px;
+}
+
+.star {
+    color: #856404;
+}
