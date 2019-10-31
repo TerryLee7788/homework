@@ -4,8 +4,7 @@ import styles from './GithubRepoList.module.css';
 const GithubRepoList = ({
     url,
     repoName,
-    owner,
-    startCount
+    owner
 }) => (
     <li className={styles.list}>
         <a

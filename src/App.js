@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import Dcard from './libs/Dcard';
 import Service from './libs/Service';
 
-import SearchInput from './componets/SearchInput';
-import GithubRepoList from './componets/GithubRepoList';
+import SearchInput from './components/SearchInput';
+import GithubRepoList from './components/GithubRepoList';
 
 import './normalize.css';
 
