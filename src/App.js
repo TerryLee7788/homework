@@ -42,29 +42,30 @@ class App extends Component {
 
     doingGithubRepoSearch = async () => {
 
-        await Service.searchRepositories({
-            q: this.state.inputValue,
-            page: this.state.page
-        })
-            .then((res) => {
+        try {
 
-                this.setState((prevState) => {
+            const response = await Service.searchRepositories({
+                q: this.state.inputValue,
+                page: this.state.page
+            });
 
-                    const repos = [ ...prevState.repos.concat(res.data.items) ];
+            this.setState((prevState) => {
 
-                    return {
-                        repos,
-                        moreData: res.data.items.length === 30
-                    };
+                const repos = [ ...prevState.repos, ...response.data.items ];
 
-                });
-
-            })
-            .catch((err) => {
-
-                console.log(err);
+                return {
+                    repos,
+                    moreData: response.data.items.length === 30
+                };
 
             });
+
+        }
+        catch (err) {
+
+            console.log(err);
+
+        }
 
     };
 
