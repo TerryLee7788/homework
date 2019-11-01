@@ -40,32 +40,30 @@ class App extends Component {
 
     }
 
+    componentDidCatch (error, info) {
+
+        console.log(error);
+        console.log(info);
+
+    }
+
     doingGithubRepoSearch = async () => {
 
-        try {
+        const response = await Service.searchRepositories({
+            q: this.state.inputValue,
+            page: this.state.page
+        });
 
-            const response = await Service.searchRepositories({
-                q: this.state.inputValue,
-                page: this.state.page
-            });
+        this.setState((prevState) => {
 
-            this.setState((prevState) => {
+            const repos = [ ...prevState.repos, ...response.data.items ];
 
-                const repos = [ ...prevState.repos, ...response.data.items ];
+            return {
+                repos,
+                moreData: response.data.items.length === 30
+            };
 
-                return {
-                    repos,
-                    moreData: response.data.items.length === 30
-                };
-
-            });
-
-        }
-        catch (err) {
-
-            console.log(err);
-
-        }
+        });
 
     };
 
