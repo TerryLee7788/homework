@@ -1,0 +1,7 @@
+.loading {
+    visibility: hidden;
+}
+
+.loading.show {
+    visibility: visible;
+}

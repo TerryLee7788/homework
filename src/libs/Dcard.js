@@ -25,10 +25,15 @@ const Dcard = {
             const now = new Date().getTime();
 
             if (last &&
-                now < last + delay
+                now - last > delay
             ) {
 
-                clearTimeout(timer);
+                if (timer) {
+
+                    clearTimeout(timer);
+                    timer = null;
+
+                }
                 timer = setTimeout(() => {
 
                     fun(...args);

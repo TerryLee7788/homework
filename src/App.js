@@ -4,6 +4,9 @@ import Service from './libs/Service';
 
 import SearchInput from './components/SearchInput';
 import GithubRepo from './components/GithubRepo';
+import Popup from './components/Popup';
+import Loading from './components/Loading';
+import InfiniteScroll from './components/InfiniteScroll';
 
 import './normalize.css';
 
@@ -17,90 +20,77 @@ class App extends Component {
         this.state = {
             inputValue: '',
             repos: [],
+            haveSearched: false,
             moreData: false,
-            page: 1
+            page: 1,
+            isFetching: false
         };
-
-        this.appRef = React.createRef();
-        this.positioned = 0;
-
-    }
-
-    componentDidMount () {
-
-        this.positioned = window.scrollY;
-
-        window.addEventListener('scroll', this.handleWindowScroll);
-
-    }
-
-    componentWillUnmount () {
-
-        window.removeEventListener('scroll', this.handleWindowScroll);
-
-    }
-
-    componentDidCatch (error, info) {
-
-        console.log(error);
-        console.log(info);
 
     }
 
     doingGithubRepoSearch = async () => {
 
-        const response = await Service.searchRepositories({
-            q: this.state.inputValue,
-            page: this.state.page
+        if (this.state.isFetching) return;
+
+        this.setState({
+            isFetching: true
         });
 
-        this.setState((prevState) => {
+        try {
 
-            const repos = [ ...prevState.repos, ...response.data.items ];
+            const response = await Service.searchRepositories({
+                q: this.state.inputValue,
+                page: this.state.page
+            })
 
-            return {
-                repos,
-                moreData: response.data.items.length === 30
-            };
+            this.setState((prevState) => {
 
-        });
+                console.log('response: ', response);
+                const repos = [ ...prevState.repos, ...response.data.items ];
 
-    };
+                return {
+                    repos,
+                    moreData: response.data.items.length === 30,
+                    isFetching: false,
+                    hasError: false,
+                    haveSearched: true,
+                    errorMessage: ''
+                };
 
-    handleWindowScroll = Dcard.throttle(() => {
+            });
 
-        const nowPosition = window.scrollY,
-            almostBottomRangeBuffer = Math.round(window.innerHeight / 2),
-            currentScroll = window.innerHeight + window.scrollY,
-            appHeight = this.appRef.current.offsetHeight;
+        }
+        catch (error) {
 
-        // 檢查他是往下滑
-        if (
-            nowPosition > this.positioned &&
-            this.state.moreData
-        ) {
+            const errorResponse = error.response;
+            console.log('errorResponse: ', errorResponse);
 
-            if (currentScroll > (appHeight - almostBottomRangeBuffer)) {
-
-                const page = this.state.page + 1;
-
-                this.setState({
-                    page
-                }, this.doingGithubRepoSearch);
-
-            }
+            this.setState({
+                hasError: true,
+                isFetching: false,
+                errorMessage: errorResponse.data.message
+            });
 
         }
 
-        this.positioned = nowPosition;
+    };
 
-    });
+    handleWindowScroll = () => {
+
+        const page = this.state.page + 1;
+
+        this.setState({
+            page
+        }, this.doingGithubRepoSearch);
+
+    };
 
     handleInputChange = Dcard.debounce((inputValue) => {
 
         this.setState({
             inputValue,
             repos: [],
+            haveSearched: false,
             page: 1
         }, () => {
 
@@ -117,44 +107,75 @@ class App extends Component {
     render () {
 
         return (
-            <div
-                className={styles.appMain}
-                ref={this.appRef}
-            >
+            <div className={styles.appMain}>
                 <main>
+                    {/* SearchInput */}
                     <section>
-                        <div
-                            className={styles.mainFocus}
-                        >
-                            <div className={styles.title}>Dcard HomeWork~</div>
+                        <div className={styles.mainFocus}>
+                            <div className={styles.title}>Git Repository Search</div>
                             <SearchInput
                                 handleInputChange={this.handleInputChange}
+                                disabled={this.state.isFetching}
+                            />
+                            <Loading
+                                isFetching={this.state.isFetching}
                             />
                         </div>
                     </section>
+                    {/* GithubRepo */}
                     {
                         this.state.repos.length
                             ? (
                                 <section>
                                     <h1>Repository Lists:</h1>
-                                    <ul>
-                                        {
-                                            this.state.repos.map((item, idx) => (
-                                                <li
-                                                    className={styles.list}
-                                                    key={`${item.id}${idx}`}
-                                                >
-                                                    <GithubRepo
-                                                        url={item.html_url}
-                                                        repoName={item.full_name}
-                                                        owner={item.owner.login}
-                                                    />
-                                                </li>
-                                            ))
-                                        }
-                                    </ul>
+                                    <InfiniteScroll
+                                        isFetching={this.state.isFetching}
+                                        hasError={this.state.hasError}
+                                        callback={this.handleWindowScroll}
+                                    >
+                                        <ul>
+                                            {
+                                                this.state.repos.map((item, idx) => (
+                                                    <li
+                                                        className={styles.list}
+                                                        key={`${item.id}${idx}`}
+                                                    >
+                                                        <GithubRepo
+                                                            url={item.html_url}
+                                                            repoName={item.full_name}
+                                                            owner={item.owner.login}
+                                                        />
+                                                    </li>
+                                                ))
+                                            }
+                                        </ul>
+                                    </InfiniteScroll>
                                 </section>
                             )
+                            : (null)
+                    }
+                    {/* message Popup */}
+                    {
+                        this.state.hasError
+                            ? (
+                                <Popup
+                                    message={this.state.errorMessage}
+                                />
+                            )
+                            : (null)
+                    }
+                    {/* no search result */}
+                    {
+                        this.state.repos.length === 0 &&
+                        this.state.haveSearched
+                            ? (<h3>No Search Result. :'(</h3>)
+                            : (null)
+                    }
+                    {/* no more data */}
+                    {
+                        !this.state.moreData &&
+                        this.state.repos.length
+                            ? (<h3>No more Repository. :'(</h3>)
                             : (null)
                     }
                 </main>
